@@ -21,12 +21,16 @@ on the root directory, CommonVariables.cmake just sets a cmake environment varia
 after building with these commands the final executable will be on ./build/Debug/shaders_test.exe (from root directory)
 
 <br>
-1. the setup_window files handle GLFW window creation and have some Raylib functions in order to track inputs so we can set events.
-2. shader.cpp has a simple class to create shader Programs, buffers, and draw calls
-3. filepath.hpp has some simple functions to get shader file path from the assets relative position to the executable
-4. math folder has classes to make it easier to do math with vectors, matrices, etc... I created two versions of Vector2 because Raylib uses a different struct,
+> the setup_window files handle GLFW window creation and have some Raylib functions in order to track inputs so we can set events.
+<br>
+> shader.cpp has a simple class to create shader Programs, buffers, and draw calls
+<br>
+> filepath.hpp has some simple functions to get shader file path from the assets relative position to the executable
+<br>
+> math folder has classes to make it easier to do math with vectors, matrices, etc... I created two versions of Vector2 because Raylib uses a different struct,
   so there is RVec2 which is a simple vector for the Raylib related functions (events) but the main one is the Vector2 class which comes from threepp
-5. cameras folder has the camera classes, they inherit from Object3D which is a class that holds information on how to update the Objects position, model matrices, etc...on the visualization
+<br>
+> cameras folder has the camera classes, they inherit from Object3D which is a class that holds information on how to update the Objects position, model matrices, etc...on the visualization
 
 <br>
 
