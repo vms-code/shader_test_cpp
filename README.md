@@ -38,7 +38,8 @@ Object3D objects you should multiply it's matrix with the camera matrix and use 
 // Create some class that inherits from Object3D
 class programMesh : public Object3D {}
 ...
-// updates Objects modelView matrix by multiplying model worlds coordinate with matrix world inverse coordinates
+// updates Objects modelView matrix by multiplying model worlds coordinate with matrix world
+// inverse coordinates
 programMesh->modelViewMatrix.multiplyMatrices(camera->matrixWorldInverse, *programMesh->matrixWorld);
 programMesh->normalMatrix.getNormalMatrix(programMesh->modelViewMatrix);
 
