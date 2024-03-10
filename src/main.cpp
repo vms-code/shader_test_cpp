@@ -12,6 +12,7 @@
 
 //
 #include "Events/CameraEvents.hpp"
+#include "Label/LabelShader.hpp"
 #include "Shader.hpp"
 #include "cameras/PerspectiveCamera.hpp"
 #include "filepath.hpp"
@@ -21,8 +22,8 @@ extern CoreData CORE;
 
 // Main code
 int main(int, char**) {
-    int windowWidth = 1900;
-    int windowHeight = 1200;
+    int windowWidth = 1500;
+    int windowHeight = 900;
 
     // Create window with graphics context
     GLFWwindow* window = InitWindow(windowWidth, windowHeight, "Dear ImGui GLFW+OpenGL3 example");
@@ -52,7 +53,7 @@ int main(int, char**) {
         float a = 1.0f;
     };
 
-    backgroundColor bgColor;
+    backgroundColor bgColor = { 0.5f, 0.5f, 0.5f, 1.0f };
 
     // Specify the relative path to the shader file
     std::string relativeVertexShaderPath = "shaders/basic.vert";
@@ -62,11 +63,6 @@ int main(int, char**) {
     std::optional<std::string> absoluteVertexShaderPath = GetAssetsPath(relativeVertexShaderPath);
     std::optional<std::string> absoluteFragmentShaderPath = GetAssetsPath(relativeFragmentShaderPath);
 
-    // Specify relative paths for vertex and fragment shaders
-    // std::string vertexShaderPath = "../assets/shaders/meshbasic.vert";
-    // std::string fragmentShaderPath = "../assets/shaders/meshbasic.frag";
-
-    // Program mesh_program = Program::Program(mesh_for_program, vertexShaderPath, fragmentShaderPath);
     //  Create a shared pointer to a Program instance
     Shader shader(*absoluteVertexShaderPath, *absoluteFragmentShaderPath);
 
@@ -78,9 +74,26 @@ int main(int, char**) {
 
     // create buffer for triangle
     shader.createBuffer("position", vertices, GL_STATIC_DRAW, 3, 0, 0);
-    shader.Use();
-
     shader.set_glUniformMatrix4fv("projection", camera->projectionMatrix);  // setup shader projection matrix
+    glUseProgram(0);
+
+    // SETUP TEXT SHADER
+    std::string relativeFontPath = "fonts/anonymous_pro_bold.ttf";
+    // std::optional<std::string> absoluteFontPath = GetAssetsPath(relativeFontPath);
+    std::optional<std::string> absoluteFontPath = "C:\\Users\\vitor\\Documents\\CODE\\C++\\ShaderTraining\\simple_test_project\\build\\assets\\fonts\\anonymous_pro_bold.ttf";
+
+    // Specify the relative path to the shader file
+    std::string relativeTextVertexShaderPath = "shaders/text.vert";
+    std::string relativeTextFragmentShaderPath = "shaders/sdf.frag";
+
+    // Construct the absolute path to the shader file
+    std::optional<std::string> absoluteTextVertexShaderPath = GetAssetsPath(relativeTextVertexShaderPath);
+    std::optional<std::string> absoluteTextFragmentShaderPath = GetAssetsPath(relativeTextFragmentShaderPath);
+
+    graphics::LabelShader textShader("Signed Distance Fields", *absoluteTextVertexShaderPath, *absoluteTextFragmentShaderPath, *absoluteFontPath);
+    textShader.set_glUniformMatrix4fv("projection", camera->projectionMatrix);  // setup textShader projection matrix
+    // textShader.set_raylib_projection();  // setup textShader projection matrix
+    glUseProgram(0);
 
     // TEXT FOR CAMERA INFO UPDATE
     // Initialize glText
@@ -96,6 +109,9 @@ int main(int, char**) {
     double time;
 
     std::ostringstream cameraLog;
+    textShader.rotateX(90.0f);
+    // textShader.translateY(-2.0f);
+
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
         time = glfwGetTime();
@@ -113,11 +129,19 @@ int main(int, char**) {
             camera_mouse_up();
 
         // update camera matrices and frustum
+        textShader.updateMatrixWorld();
         if (camera->parent == nullptr) camera->updateMatrixWorld();
         shader.set_glUniformMatrix4fv("modelView", camera->matrixWorldInverse);
+        glUseProgram(0);
+
+        textShader.modelViewMatrix.multiplyMatrices(camera->matrixWorldInverse, *textShader.matrixWorld);
+        textShader.normalMatrix.getNormalMatrix(textShader.modelViewMatrix);
+        textShader.set_glUniformMatrix4fv("modelView", textShader.modelViewMatrix);
+        glUseProgram(0);
 
         // rendering goes here
-        shader.render(GL_TRIANGLES, 0, 3);
+        // shader.render(GL_TRIANGLES, 0, 3);
+        textShader.render();
 
         gltBeginDraw();
         // update camera position display
@@ -130,7 +154,7 @@ int main(int, char**) {
 
         // sprintf(str, "Time: %.4f", time);
         // gltSetText(text, str);
-        gltColor(cosf((float)time) * 0.5f + 0.5f, sinf((float)time) * 0.5f + 0.5f, 1.0f, 1.0f);
+        // gltColor(cosf((float)time) * 0.5f + 0.5f, sinf((float)time) * 0.5f + 0.5f, 1.0f, 1.0f);
 
         gltDrawText2DAligned(text, 0.0f, (GLfloat)viewportHeight, 2.0f, GLT_LEFT, GLT_BOTTOM);
 

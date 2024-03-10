@@ -587,3 +587,13 @@ int GetTouchPointId(int index) {
 int GetTouchPointCount(void) {
     return CORE.Input.Touch.pointCount;
 }
+
+// Get current screen width
+int GetScreenWidth(void) {
+    return CORE.Window.screen.width;
+}
+
+// Get current screen height
+int GetScreenHeight(void) {
+    return CORE.Window.screen.height;
+}

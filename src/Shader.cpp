@@ -232,6 +232,8 @@ void Shader::render(unsigned int mode_, int start, int count) {
     glUseProgram(program);
     glBindVertexArray(VAO);
     glDrawArrays(mode_, start, count);
+    glBindVertexArray(0);
+    glUseProgram(0);
 }
 
 void Shader::renderIndexAttribute(int start, int count) {

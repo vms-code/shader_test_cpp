@@ -25,6 +25,8 @@ include(CommonVariables.cmake)
 add_executable(${PROJECT_NAME} 
     src/main.cpp
     src/Shader.cpp
+    src/objects/Label/LabelShader.cpp
+    src/objects/Label/helpers.cpp
     src/setup_window.cpp
     src/Events/CameraEvents.cpp
 
@@ -34,6 +36,7 @@ add_executable(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME}
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/include/objects
         ${CMAKE_CURRENT_SOURCE_DIR}/external
         ${CMAKE_CURRENT_SOURCE_DIR}/external/glad/include
 )

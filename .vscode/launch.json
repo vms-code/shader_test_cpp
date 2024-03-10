@@ -1,0 +1,58 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug GDB",
+            "type": "cppvsdbg",
+            "request": "launch",
+            // Resolved by CMake Tools:
+            //"program": "${command:cmake.launchTargetPath}",
+            "program": "${workspaceFolder}\\build\\Debug\\shaders_test.exe",
+            "cwd": "${workspaceFolder}/build",
+            /*
+            "args": [
+                //"-DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE",
+                //"--config",
+                //"Debug",
+                //"--debug-output"
+            ],
+            "stopAtEntry": true,
+            "environment": [
+                {
+                    // add the directory where our target was built to the PATHs
+                    // it gets resolved by CMake Tools:
+                    "name": "PATH",
+                    //"value": "${env:PATH}:${command:cmake.getLaunchTargetDirectory}",
+                }
+            ],
+            "externalConsole": false,
+            "symbolOptions": {
+                "searchPaths": [
+                    "C:\\Users\\vitor\\Documents\\CODE\\C++\\gui_beginning_project\\raylib_sdf_text_example\\build"
+                ],
+                "cachePath": "%TEMP%\\symcache",
+            },
+            */
+            //"MIMode": "gdb",
+            //"miDebuggerPath": "C:\\ProgramData\\chocolatey\\bin\\gdb.exe",
+            //"miDebuggerPath": "C:\\MinGW\\bin\\gdb.exe",ee
+            //"miDebuggerArgs": "", // additional arguments to pass to gdb
+            /*
+            
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "symbolLoadInfo": {
+                "loadAll": true,
+                "exceptionList": ""
+            },
+            "additionalSOLibSearchPath": "C:\\Users\\vitor\\Documents\\CODE\\C++\\gui_beginning_project\\raylib_sdf_text_example\\build\\Debug\\opengl.pdb;C:\\Users\\vitor\\Documents\\CODE\\C++\\gui_beginning_project\\raylib_sdf_text_example\\build\\external\\raylib\\raylib\\Debug\\raylib.pdb;C:\\Users\\vitor\\Documents\\CODE\\C++\\gui_beginning_project\\raylib_sdf_text_example\\build\\opengl.dir\\Debug\\vc143.pdb",
+            */
+            //"preLaunchTask": "build debug"
+        }
+    ]
+}

@@ -184,6 +184,11 @@ RVec2 GetTouchPosition(int index);  // Get touch position XY for a touch point i
 int GetTouchPointId(int index);     // Get touch point identifier for given index
 int GetTouchPointCount(void);       // Get number of touch points
 
+// Get current screen width
+int GetScreenWidth(void);
+// Get current screen height
+int GetScreenHeight(void);
+
 //----------------------------------------------------------------------------------
 // Enumerators Definition
 //----------------------------------------------------------------------------------

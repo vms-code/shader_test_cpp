@@ -45,6 +45,7 @@ void camera_zoom(std::shared_ptr<graphics::PerspectiveCamera> camera, int window
         graphics::Vector3 newScale3(newScaleX, newScaleY, newScaleZ);
 
         camera->position.copy(newScale3);
+        // camera->zoom += scaleFactor;
     }
 };
 
@@ -64,16 +65,13 @@ void camera_pan(std::shared_ptr<graphics::PerspectiveCamera> camera, int windowW
     graphics::Vector3 mouseWorld(pan_mouse_x, pan_mouse_y, 0);
     mouseWorld.unproject(*camera);  // convert mouse ndc coordinates to camera view coordinates
 
-    float panX = camera->position.x - pan_mouse_x * 6.8;
-    float panY = camera->position.y - pan_mouse_y * 3.3;
+    float panX = camera->position.x - static_cast<float>(pan_mouse_x * 6.8);
+    float panY = camera->position.y - static_cast<float>(pan_mouse_y * 3.3);
     //  float newScaleZ = camera->position.z + direction.z;  //* scaleFactor;
 
     graphics::Vector3 newPanPosition(panX, panY, camera->position.z);
 
     camera->position.copy(newPanPosition);
-
-    std::cout << "mouseworld x: " << mouse_pan_ndc_x << " "
-              << "mouseworld y: " << mouse_pan_ndc_y << std::endl;
 
     cached_mouse_pan_ndc_x = mouse_pan_ndc_x;
     cached_mouse_pan_ndc_y = mouse_pan_ndc_y;
