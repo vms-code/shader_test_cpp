@@ -43,7 +43,9 @@ int main(int, char**) {
     GLFWmonitor* monitor = glfwGetPrimaryMonitor();
     const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 
-    auto camera = graphics::PerspectiveCamera::create(75, static_cast<float>(mode->width) / static_cast<float>(mode->height), 0.1f, 100);
+    float aspectRatio = static_cast<float>(mode->width) / static_cast<float>(mode->height);
+
+    auto camera = graphics::PerspectiveCamera::create(75, aspectRatio, 0.1f, 100);
     camera->position.z = 5;
 
     struct backgroundColor {
@@ -90,9 +92,9 @@ int main(int, char**) {
     std::optional<std::string> absoluteTextVertexShaderPath = GetAssetsPath(relativeTextVertexShaderPath);
     std::optional<std::string> absoluteTextFragmentShaderPath = GetAssetsPath(relativeTextFragmentShaderPath);
 
-    graphics::LabelShader textShader("Signed Distance Fields", *absoluteTextVertexShaderPath, *absoluteTextFragmentShaderPath, *absoluteFontPath);
+    Color labelColor{ 1.0, 1.0, 0.0 };
+    graphics::LabelShader textShader("}()?;&*+-/[]@#$%'\"^~:_=.\n this is a new line", *absoluteTextVertexShaderPath, *absoluteTextFragmentShaderPath, *absoluteFontPath, labelColor);
     textShader.set_glUniformMatrix4fv("projection", camera->projectionMatrix);  // setup textShader projection matrix
-    // textShader.set_raylib_projection();  // setup textShader projection matrix
     glUseProgram(0);
 
     // TEXT FOR CAMERA INFO UPDATE
@@ -109,9 +111,11 @@ int main(int, char**) {
     double time;
 
     std::ostringstream cameraLog;
-    textShader.rotateX(90.0f);
-    // textShader.translateY(-2.0f);
+    // textShader.rotateX(180.0f);
+    //   textShader.translateY(-2.0f);
 
+    double rotation = 0.0;
+    graphics::Vector3 text_position{ 0, 0, 0 };
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
         time = glfwGetTime();
@@ -127,6 +131,16 @@ int main(int, char**) {
             camera_pan(camera, viewportWidth, viewportHeight);
         else if (IsMouseButtonUp(MOUSE_BUTTON_LEFT))
             camera_mouse_up();
+
+        textShader.rotateX(rotation);
+        if (rotation > 180) {
+            rotation -= 0.000001;
+        } else {
+            rotation += 0.000001;
+        }
+
+        // textShader.position.copy(text_position);
+        //  text_position.y -= 0.01f;
 
         // update camera matrices and frustum
         textShader.updateMatrixWorld();

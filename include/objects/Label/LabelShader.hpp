@@ -26,11 +26,12 @@ struct LabelShader : public Object3D {
     Font font = { 0 };
     const char* labelText = "Signed Distance Fields";
     Vector2 textSize = { 0.0f, 0.0f };
-    float fontSize = 2.0f;
+    float fontSize = 4.0f;
     float spacing = 0.0f;
+    float lineSpace = 10.0f;  // space between lines after using \n on text
     Color tint = { 0.0f, 1.0f, 1.0f };
 
-    LabelShader(const char* labelName, const std::string& vertexShaderPath, const std::string& fragmentShaderPath, const std::string& fontPath);
+    LabelShader(const char* labelName, const std::string& vertexShaderPath, const std::string& fragmentShaderPath, const std::string& fontPath, const Color& textColor);
     std::string ReadShaderFile(const std::string& filePath) const;
     void createProgram(const std::string& vertexShaderPath, const std::string& fragmentShaderPath);
     // Convert image data to OpenGL texture (returns OpenGL valid Id)
@@ -44,11 +45,9 @@ struct LabelShader : public Object3D {
 
     // set uniform functions
     void set_glUniform1f(const std::string& uniformName, const float& newValue);
-    void set_glUniform3f(const std::string& uniformName, const Color& newValue);
+    void set_shader_text_color(const Color& newColor);
     void set_glUniformMatrix3fv(const std::string& uniformName, const Matrix3& newValue);
     void set_glUniformMatrix4fv(const std::string& uniformName, const Matrix4 newValue);
-
-    void set_raylib_projection();
 
     // vertex building functions
     void DrawTexturePro(Rectangle source, Rectangle dest, Vector2 origin, float rotation);

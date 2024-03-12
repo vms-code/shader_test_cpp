@@ -98,27 +98,22 @@ graphics::Vector2 graphics::LabelShader::MeasureTextEx(const char* text, float f
     return textSize;
 }
 
-graphics::LabelShader::LabelShader(const char* labelName, const std::string& vertexShaderPath, const std::string& fragmentShaderPath, const std::string& fontPath) {
-    // labelText = labelName;
+graphics::LabelShader::LabelShader(const char* labelName, const std::string& vertexShaderPath, const std::string& fragmentShaderPath, const std::string& fontPath, const Color& textColor) {
+    labelText = labelName;
     createProgram(vertexShaderPath, fragmentShaderPath);
     init_font(fontPath);
     // cache uniforms
     getUniforms();
     getAttributes();
-    // build vertices before creating buffers (first argument is text position)
-    // buildVertices({ this->position.x, this->position.y });  // create vertexData points and texture data
-    textSize = MeasureTextEx(labelName, fontSize, 0);
-
-    // this->position.z = -1;
-    //  float x = GetScreenWidth() / 2 - textSize.x / 2;
-    //  float y = GetScreenHeight() / 2 - textSize.y / 2 + 80;
-    //  buildVertices({ 312.0f, 297.0f });  // create vertexData points and texture data
     buildVertices({ 0.0f, 0.0f, 0.0f });  // create vertexData points and texture data
-    // std::cout << "position x: " << x << std::endl;
-    // std::cout << "position y: " << y << std::endl;
-    std::cout << "position z: " << this->position.z << std::endl;
     // build buffers using vertexData
     createTextBuffer(GL_DYNAMIC_DRAW);  // previous: GL_STREAM_DRAW, can also be: GL_STATIC_DRAW
+    Use();
+    set_shader_text_color(textColor);
+    rotateX(180.0f);
+    graphics::Vector3 starting_position{ 1, -2, 0 };
+    this->position.copy(starting_position);
+    // starting_position.y = 10;
 }
 
 void graphics::LabelShader::createProgram(const std::string& vertexShaderPath, const std::string& fragmentShaderPath) {
@@ -331,16 +326,19 @@ void graphics::LabelShader::set_glUniform1f(const std::string& uniformName, cons
     }
 }
 
-void graphics::LabelShader::set_glUniform3f(const std::string& uniformName, const Color& newValue) {
-    auto it = uniformMap.find(uniformName);
+void graphics::LabelShader::set_shader_text_color(const Color& newColor) {
+    auto it = uniformMap.find("fragTextColor");
 
     if (it != uniformMap.end()) {
         // Uniform found in the map
+        tint.r = newColor.r;
+        tint.g = newColor.g;
+        tint.b = newColor.b;
         UniformInfo& info = it->second;
-        glUniform3f(info.location, newValue.r, newValue.g, newValue.b);
+        glUniform3f(info.location, newColor.r, newColor.g, newColor.b);
     } else {
         // Uniform not found in the map
-        std::cout << "Uniform '" << uniformName << "' not found in the map." << std::endl;
+        std::cout << "Failed to set shader text color. Fragment shader doesn't use fragTextColor" << std::endl;
     }
 }
 
@@ -374,32 +372,6 @@ void graphics::LabelShader::set_glUniformMatrix4fv(const std::string& uniformNam
     } else {
         // Uniform not found in the map
         std::cout << "Uniform '" << uniformName << "' not found in the map." << std::endl;
-    }
-}
-
-void graphics::LabelShader::set_raylib_projection() {
-    glUseProgram(program);
-    auto it = uniformMap.find("projection");
-    float matMVPfloat[16] = {
-        0.00249999994, 0.00000000, 0.00000000, 0.00000000,
-        0.00000000, -0.00444444455, 0.00000000, 0.00000000,
-        0.00000000, 0.00000000, -2.00000000, 0.00000000,
-        -1.00000000, 1.00000000, -1.00000000, 1.00000000
-    };
-
-    if (it != uniformMap.end()) {
-        // Uniform found in the map
-        UniformInfo& info = it->second;
-        glUniformMatrix4fv(info.location, 1, false, matMVPfloat);
-        // Check for OpenGL errors
-        GLenum error = glGetError();
-        if (error != GL_NO_ERROR) {
-            // Handle error (print error message, log, etc.)
-            std::cerr << "OpenGL error after setting UniformMatrix4fv variable: " << error << std::endl;
-        }
-    } else {
-        // Uniform not found in the map
-        std::cout << "FAILED TO SET RAYLIB PROJECTION MATRIX ON TEXT SHADER" << std::endl;
     }
 }
 
@@ -566,7 +538,7 @@ void graphics::LabelShader::DrawTextCodepoint3D(int codepoint, graphics::Vector3
     // Character destination rectangle on screen
     // NOTE: We consider charsPadding on drawing
     position.x += (float)(font.glyphs[index].offsetX - font.glyphPadding) / (float)font.baseSize * scale;
-    position.z += (float)(font.glyphs[index].offsetY - font.glyphPadding) / (float)font.baseSize * scale;
+    position.y += (float)(font.glyphs[index].offsetY - font.glyphPadding) / (float)font.baseSize * scale;
 
     // Character source rectangle from font texture atlas
     // NOTE: We consider chars padding when drawing, it could be required for outline/glow shader effects
@@ -612,15 +584,15 @@ void graphics::LabelShader::DrawTextCodepoint3D(int codepoint, graphics::Vector3
         textCoordsData.emplace_back(th);
         // rlVertex3f(x, y, z + height);  // Bottom Left Of The Texture and Quad
         vertexData.emplace_back(position.x);
-        vertexData.emplace_back(position.y);
-        vertexData.emplace_back(position.z + height);
+        vertexData.emplace_back(position.y + height);
+        vertexData.emplace_back(position.z);
         // rlTexCoord2f(tw, th);
         textCoordsData.emplace_back(tw);
         textCoordsData.emplace_back(th);
         // rlVertex3f(x + width, y, z + height);  // Bottom Right Of The Texture and Quad
         vertexData.emplace_back(position.x + width);
-        vertexData.emplace_back(position.y);
-        vertexData.emplace_back(position.z + height);
+        vertexData.emplace_back(position.y + height);
+        vertexData.emplace_back(position.z);
         // rlTexCoord2f(tw, ty);
         textCoordsData.emplace_back(tw);
         textCoordsData.emplace_back(ty);
@@ -636,30 +608,30 @@ void graphics::LabelShader::DrawTextCodepoint3D(int codepoint, graphics::Vector3
             textCoordsData.emplace_back(tx);
             textCoordsData.emplace_back(ty);
             // rlVertex3f(x, y, z);  // Top Right Of The Texture and Quad
-            vertexData.emplace_back(x);
-            vertexData.emplace_back(y);
-            vertexData.emplace_back(z);
+            vertexData.emplace_back(position.x);
+            vertexData.emplace_back(position.y);
+            vertexData.emplace_back(position.z);
             // rlTexCoord2f(tw, ty);
             textCoordsData.emplace_back(tw);
             textCoordsData.emplace_back(ty);
             // rlVertex3f(x + width, y, z);  // Top Left Of The Texture and Quad
-            vertexData.emplace_back(x + width);
-            vertexData.emplace_back(y);
-            vertexData.emplace_back(z);
+            vertexData.emplace_back(position.x + width);
+            vertexData.emplace_back(position.y);
+            vertexData.emplace_back(position.z);
             // rlTexCoord2f(tw, th);
             textCoordsData.emplace_back(tw);
             textCoordsData.emplace_back(th);
             // rlVertex3f(x + width, y, z + height);  // Bottom Left Of The Texture and Quad
-            vertexData.emplace_back(x + width);
-            vertexData.emplace_back(y + height);
-            vertexData.emplace_back(z);
+            vertexData.emplace_back(position.x + width);
+            vertexData.emplace_back(position.y + height);
+            vertexData.emplace_back(position.z);
             // rlTexCoord2f(tx, th);
             textCoordsData.emplace_back(tx);
             textCoordsData.emplace_back(th);
             // rlVertex3f(x, y, z + height);  // Bottom Right Of The Texture and Quad
-            vertexData.emplace_back(x);
-            vertexData.emplace_back(y + height);
-            vertexData.emplace_back(z);
+            vertexData.emplace_back(position.x);
+            vertexData.emplace_back(position.y + height);
+            vertexData.emplace_back(position.z);
         }
         // rlEnd();
         // rlPopMatrix();
@@ -690,11 +662,11 @@ void graphics::LabelShader::DrawText3D(graphics::Vector3 position, bool backface
         if (codepoint == '\n') {
             // NOTE: Fixed line spacing of 1.5 line-height
             // TODO: Support custom line spacing defined by user
-            textOffsetY += scale + spacing / (float)font.baseSize * scale;
+            textOffsetY += scale + lineSpace / (float)font.baseSize * scale;
             textOffsetX = 0.0f;
         } else {
             if ((codepoint != ' ') && (codepoint != '\t')) {
-                DrawTextCodepoint3D(codepoint, { position.x + textOffsetX, position.y, position.z + textOffsetY }, backface);
+                DrawTextCodepoint3D(codepoint, { position.x + textOffsetX, position.y + textOffsetY, position.z }, backface);
             }
 
             if (font.glyphs[index].advanceX == 0)
@@ -771,7 +743,7 @@ void graphics::LabelShader::buildIndexBufferData() {
 
 void graphics::LabelShader::buildVertices(graphics::Vector3 fontPosition) {
     // DrawTextEx(fontPosition);
-    DrawText3D(fontPosition, false);
+    DrawText3D(fontPosition, true);
     //  DrawTexture(10, 10, 0, 1.0f);
     buildIndexBufferData();
 }
