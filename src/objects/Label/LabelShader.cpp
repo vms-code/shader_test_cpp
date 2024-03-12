@@ -110,10 +110,10 @@ graphics::LabelShader::LabelShader(const char* labelName, const std::string& ver
     createTextBuffer(GL_DYNAMIC_DRAW);  // previous: GL_STREAM_DRAW, can also be: GL_STATIC_DRAW
     Use();
     set_shader_text_color(textColor);
-    rotateX(180.0f);
-    graphics::Vector3 starting_position{ 1, -2, 0 };
-    this->position.copy(starting_position);
-    // starting_position.y = 10;
+    // rotateX(180.0f);
+    //   graphics::Vector3 starting_position{ 0, 0, 0 };
+    //   this->position.copy(starting_position);
+    //    starting_position.y = 10;
 }
 
 void graphics::LabelShader::createProgram(const std::string& vertexShaderPath, const std::string& fragmentShaderPath) {

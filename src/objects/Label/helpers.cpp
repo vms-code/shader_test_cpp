@@ -116,9 +116,10 @@ unsigned char *LoadFileData(const char *fileName, int *dataSize) {
     *dataSize = 0;
 
     if (fileName != NULL) {
-        FILE *file = fopen(fileName, "rb");
+        FILE *file;
+        errno_t err = fopen_s(&file, fileName, "rb");
 
-        if (file != NULL) {
+        if (err == 0 && file != NULL) {
             // WARNING: On binary streams SEEK_END could not be found,
             // using fseek() and ftell() could not work in some (rare) cases
             fseek(file, 0, SEEK_END);
@@ -390,7 +391,7 @@ Image GenImageFontAtlas(const GlyphInfo *glyphs, Rectangle **glyphRecs, int glyp
         stbrp_context *context = (stbrp_context *)malloc(sizeof(*context));
         stbrp_node *nodes = (stbrp_node *)malloc(glyphCount * sizeof(*nodes));
 
-        stbrp_init_target(context, atlas.width, atlas.height, nodes, glyphCount);
+        raylib_stbrp_init_target(context, atlas.width, atlas.height, nodes, glyphCount);
         stbrp_rect *rects = (stbrp_rect *)malloc(glyphCount * sizeof(stbrp_rect));
 
         // Fill rectangles for packaging
@@ -401,7 +402,7 @@ Image GenImageFontAtlas(const GlyphInfo *glyphs, Rectangle **glyphRecs, int glyp
         }
 
         // Package rectangles into atlas
-        stbrp_pack_rects(context, rects, glyphCount);
+        raylib_stbrp_pack_rects(context, rects, glyphCount);
 
         for (int i = 0; i < glyphCount; i++) {
             // It returns char rectangles in atlas

@@ -116,6 +116,7 @@ int main(int, char**) {
 
     double rotation = 0.0;
     graphics::Vector3 text_position{ 0, 0, 0 };
+    // textShader.rotateX(180);
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
         time = glfwGetTime();
@@ -132,12 +133,14 @@ int main(int, char**) {
         else if (IsMouseButtonUp(MOUSE_BUTTON_LEFT))
             camera_mouse_up();
 
+        /*
         textShader.rotateX(rotation);
         if (rotation > 180) {
             rotation -= 0.000001;
         } else {
             rotation += 0.000001;
         }
+        */
 
         // textShader.position.copy(text_position);
         //  text_position.y -= 0.01f;
@@ -148,6 +151,8 @@ int main(int, char**) {
         shader.set_glUniformMatrix4fv("modelView", camera->matrixWorldInverse);
         glUseProgram(0);
 
+        // textShader.matrixWorld->lookAt(textShader.position, camera->position, { 0.0, 1.0, 0.0 });
+        // textShader.matrixWorld->makeRotationX(180.0f);
         textShader.modelViewMatrix.multiplyMatrices(camera->matrixWorldInverse, *textShader.matrixWorld);
         textShader.normalMatrix.getNormalMatrix(textShader.modelViewMatrix);
         textShader.set_glUniformMatrix4fv("modelView", textShader.modelViewMatrix);

@@ -18,8 +18,17 @@ void main() {
     fragTexCoord = vertexTexCoord;
     //fragColor = vertexColor;
 
-    vec4 point_position = vec4( position, 1.0 );
+    vec3 pos = position;
+    // billboarding
+    // Quad billboard: Works only on quads that have its center at origin.
+    // http://www.songho.ca/opengl/files/gl_anglestoaxes01.png
+    vec3 right = vec3( modelView[0][0], modelView[1][0], modelView[2][0]),
+        up = vec3( modelView[0][1], modelView[1][1], modelView[2][1] );
 
+    // Rotate vertex toward camera
+    pos = (right * pos.x) - (up * pos.y);
+
+    vec4 point_position = vec4( pos, 1.0 );
     // Calculate final vertex position
     gl_Position = projection * modelView * point_position;
     //gl_Position = projection * point_position;
